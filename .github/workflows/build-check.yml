@@ -1,0 +1,33 @@
+name: Build check
+
+# Runs on every PR and non-main push so a broken build is caught before merge.
+# main is already covered by azure-deploy.yml which also builds before deploying.
+
+on:
+  pull_request:
+  push:
+    branches-ignore: [main]
+
+env:
+  NODE_VERSION: '20.x'
+  # SQLite path used for prisma generate (no real DB connection needed at build
+  # time because every page that queries the DB is marked force-dynamic).
+  DATABASE_URL: 'file:./ci.db'
+
+jobs:
+  build:
+    name: TypeScript + Next.js build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build

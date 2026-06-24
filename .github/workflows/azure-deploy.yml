@@ -32,6 +32,8 @@ jobs:
 
       # Build here too, so the deploy fails fast on a broken build.
       - name: Install & build
+        env:
+          DATABASE_URL: 'file:./ci.db'
         run: |
           npm ci
           npm run build
